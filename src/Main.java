@@ -1,35 +1,54 @@
 import java.util.Scanner;
-
 public class Main {
 
-    private static void lineEditorMainPage() {
-
-        String[] inputs = findInputs();
-        char currentCommand = inputs[0].charAt(0);
-
-        switch (currentCommand) {
-            case 's':
-                substituteCmd(inputs[1], inputs[2]);
-            case 'l':
-                locateCmd(inputs[1]);
-            case 'd':
-                deleteCmd(inputs[1]);
-            case 'm':
-                moveCmd(inputs[1]);
-            case 't':
-                typeCmd(inputs[1]);
-            case 'p':
-                pasteCmd();
-            case 'i':
-                insertCmd(inputs[1]);
-            case 'r':
-                replaceCmd(inputs[1]);
-            case 'q':
-                quitCmd();
+    public static void main(String[] args) {
+        char currentCommand = ' ';
+        showOptions();
+        while (currentCommand != 'q') {
+            String[] inputs = findInputs();
+            currentCommand = getCurrentCommand(inputs);
+            chooseAction(inputs);
         }
     }
 
-    private static String[] findInputs() {
+    private static void chooseAction(String[] inputs) {
+        char currentCommand = getCurrentCommand(inputs);
+        switch (currentCommand) {
+            case 's':
+                substituteCmd(inputs[0]);
+                break;
+            case 'l':
+                locateCmd(inputs[0]);
+                break;
+            case 'd':
+                deleteCmd(inputs[0]);
+                break;
+            case 'm':
+                moveCmd(inputs[0]);
+                break;
+            case 't':
+                typeCmd(inputs[0]);
+                break;
+            case 'p':
+                pasteCmd();
+                break;
+            case 'i':
+                insertCmd(inputs[0]);
+                break;
+            case 'r':
+                replaceCmd(inputs[0]);
+                break;
+            case 'q':
+                quitCmd();
+                break;
+        }
+    }
+
+    private static char getCurrentCommand(String[] inputs) {
+        return inputs[0].toLowerCase().charAt(0);
+    }
+
+    public static String[] findInputs() {
         String refString = "sldmtpirq";
         boolean choiceIsNotValid = true;
         String[] inputs = new String[]{};
@@ -37,7 +56,8 @@ public class Main {
         while (choiceIsNotValid) {
             String userInput = enterInputs();
             inputs = userInput.split(" ");
-            if (refString.indexOf(inputs[0].charAt(0)) < 0 ) {
+            char inputChar = inputs[0].toLowerCase().charAt(0);
+            if (refString.indexOf(inputChar) < 0 ) {
                 System.out.println("Invalid choice.");
             } else {
                 choiceIsNotValid = false;
@@ -48,39 +68,56 @@ public class Main {
 
     public static String enterInputs() {
         Scanner input = new Scanner(System.in);
+        System.out.print("Please make a choice > ");
         return input.nextLine();
     }
 
-    private static void substituteCmd(String input, String input1) {
+    private static void showOptions() {
+        System.out.println("Line Editor");
+        System.out.println("Substitute/oldstring/newstring/\t\tType #");
+        System.out.println("Copy #\t\t\t\t\t\t\t\tPaste #");
+        System.out.println("Locate/string/\t\t\t\t\t\tInsert #");
+        System.out.println("Delete #\t\t\t\t\t\t\tReplace #");
+        System.out.println("Move #\t\t\t\t\t\t\t\tQuit #");
 
     }
 
-    private static void locateCmd(String input) {
+    public static void substituteCmd(String input) {
+        System.out.println("you have chosen \"Substitue\".");
+    }
+
+    public static void locateCmd(String input) {
+        System.out.println("you have chosen \"Locate\".");
+    }
+
+    public static void deleteCmd(String input) {
+        System.out.println("you have chosen \"Delete\".");
+    }
+
+    public static void moveCmd(String input) {
+        System.out.println("you have chosen \"Move\".");
+    }
+
+    public static void typeCmd(String input) {
+        System.out.println("you have chosen \"Type\".");
 
     }
 
-    private static void deleteCmd(String input) {
+    public static void pasteCmd() {
+        System.out.println("you have chosen \"Paste\".");
 
     }
 
-    private static void moveCmd(String input) {
-    }
-
-    private static void typeCmd(String input) {
+    public static void insertCmd(String input) {
+        System.out.println("you have chosen \"Insert\".");
 
     }
 
-    private static void pasteCmd() {
-
+    public static void replaceCmd(String input) {
+        System.out.println("you have chosen \"Replace\".");
     }
 
-    private static void insertCmd(String input) {
-
-    }
-
-    private static void replaceCmd(String input) {
-    }
-
-    private static void quitCmd() {
+    public static void quitCmd() {
+        System.out.println("you have chosen \"Quit\".");
     }
 }
