@@ -17,6 +17,9 @@ public class Main {
             case 's':
                 substituteCmd(inputs[0]);
                 break;
+            case 'c':
+                copyCmd(inputs[0]);
+                break;
             case 'l':
                 locateCmd(inputs[0]);
                 break;
@@ -44,12 +47,13 @@ public class Main {
         }
     }
 
+
     private static char getCurrentCommand(String[] inputs) {
         return inputs[0].toLowerCase().charAt(0);
     }
 
     public static String[] findInputs() {
-        String refString = "sldmtpirq";
+        String refString = "scldmtpirq";
         boolean choiceIsNotValid = true;
         String[] inputs = new String[]{};
 
@@ -84,6 +88,10 @@ public class Main {
 
     public static void substituteCmd(String input) {
         System.out.println("you have chosen \"Substitue\".");
+    }
+
+    private static void copyCmd(String input) {
+        System.out.println("you have chosen \"Copy\".");
     }
 
     public static void locateCmd(String input) {
