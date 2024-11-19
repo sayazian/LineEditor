@@ -83,10 +83,10 @@ public class Main {
     private static void showOptions() {
         System.out.println("Line Editor");
         System.out.println("Substitute/oldstring/newstring/\t\tType #");
-        System.out.println("Copy #\t\t\t\t\t\t\t\tPaste #");
+        System.out.println("Copy #\t\t\t\t\t\t\t\tPaste");
         System.out.println("Locate/string/\t\t\t\t\t\tInsert #");
         System.out.println("Delete #\t\t\t\t\t\t\tReplace #");
-        System.out.println("Move #\t\t\t\t\t\t\t\tQuit #");
+        System.out.println("Move #\t\t\t\t\t\t\t\tQuit");
 
     }
 
@@ -101,7 +101,10 @@ public class Main {
     }
 
     private static void copyCmd(String input) {
-        System.out.println("you have chosen \"Copy\".");
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("you have chosen to \"Copy\" line #" + number + ".");
+        }
     }
 
     public static void locateCmd(String input) {
@@ -114,33 +117,69 @@ public class Main {
     }
 
     public static void deleteCmd(String input) {
-        System.out.println("you have chosen \"Delete\".");
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("You have chosen to \"Delete\" line #" + number + ".");
+        }
     }
 
     public static void moveCmd(String input) {
-        System.out.println("you have chosen \"Move\".");
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("You have chosen to \"Move\" line #" + number + ".");
+        }
     }
 
     public static void typeCmd(String input) {
-        System.out.println("you have chosen \"Type\".");
-
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("You have chosen to \"Type\" line #" + number + ".");
+        }
     }
 
     public static void pasteCmd() {
-        System.out.println("you have chosen \"Paste\".");
+        System.out.println("You have chosen \"Paste\".");
 
     }
 
     public static void insertCmd(String input) {
-        System.out.println("you have chosen \"Insert\".");
-
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("You have chosen to \"Insert\" line #" + number + ".");
+        }
     }
 
     public static void replaceCmd(String input) {
-        System.out.println("you have chosen \"Replace\".");
+        int number = getLineNumber(input);
+        if (number > 0) {
+            System.out.println("You have chosen to \"Replace\" line #" + number + ".");
+        }
     }
 
     public static void quitCmd() {
-        System.out.println("you have chosen \"Quit\".");
+        System.out.println("You have chosen \"Quit\".");
     }
+
+    private static int getLineNumber(String input) {
+        String[] inputs = input.split(" ");
+        if (inputs.length != 2) {
+            System.out.println("Invalid line number.");
+            return -1;
+        }
+        return isNumeric(inputs[1]);
+    }
+
+    private static int isNumeric(String input) {
+        char[] inputs = input.toCharArray();
+        String numbers = "0123456789";
+
+        for (int i = 0; i < input.length(); i++) {
+            if (numbers.indexOf(inputs[i]) < 0) {
+                System.out.println("The line number is invalid.");
+                return -1;
+            }
+        }
+        return Integer.parseInt(input);
+    }
+
 }
