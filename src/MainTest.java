@@ -3,12 +3,12 @@ import org.junit.jupiter.api.Test;
 class MainTest {
 
     @Test
-    void findInputs() {
+    void readInputs() {
     }
 
     @Test
     void enterInputs() {
-        String theInput = Main.enterInputs();
+        String theInput = Main.readInput();
         System.out.println(theInput);
     }
 

@@ -1,76 +1,80 @@
 import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) {
-        char currentCommand = ' ';
+        boolean continued = true;
         showOptions();
-        while (currentCommand != 'q') {
-            String[] inputs = findInputs();
-            currentCommand = getCurrentCommand(inputs);
-            chooseAction(inputs);
+        while (continued) {
+            String userInput = readInputs();
+            continued = runAction(userInput);
         }
     }
 
-    private static void chooseAction(String[] inputs) {
-        char currentCommand = getCurrentCommand(inputs);
+    private static boolean runAction(String userInput) {
+        char currentCommand = getCurrentCommand(userInput);
+        boolean continued = true;
+
         switch (currentCommand) {
             case 's':
-                substituteCmd(inputs[0]);
+                substituteCmd(userInput);
                 break;
             case 'c':
-                copyCmd(inputs[0]);
+                copyCmd(userInput);
                 break;
             case 'l':
-                locateCmd(inputs[0]);
+                locateCmd(userInput);
                 break;
             case 'd':
-                deleteCmd(inputs[0]);
+                deleteCmd(userInput);
                 break;
             case 'm':
-                moveCmd(inputs[0]);
+                moveCmd(userInput);
                 break;
             case 't':
-                typeCmd(inputs[0]);
+                typeCmd(userInput);
                 break;
             case 'p':
                 pasteCmd();
                 break;
             case 'i':
-                insertCmd(inputs[0]);
+                insertCmd(userInput);
                 break;
             case 'r':
-                replaceCmd(inputs[0]);
+                replaceCmd(userInput);
                 break;
             case 'q':
                 quitCmd();
+                continued = false;
                 break;
         }
+        return continued;
     }
 
 
-    private static char getCurrentCommand(String[] inputs) {
-        return inputs[0].toLowerCase().charAt(0);
+    private static char getCurrentCommand(String userInput) {
+        return userInput.toLowerCase().charAt(0);
     }
 
-    public static String[] findInputs() {
+    public static String readInputs() {
         String refString = "scldmtpirq";
         boolean choiceIsNotValid = true;
         String[] inputs = new String[]{};
+        String userInput = "";
 
         while (choiceIsNotValid) {
-            String userInput = enterInputs();
-            inputs = userInput.split(" ");
-            char inputChar = inputs[0].toLowerCase().charAt(0);
-            if (refString.indexOf(inputChar) < 0 ) {
+            userInput = readInput();
+            char inputChar = userInput.toLowerCase().charAt(0);
+            if (refString.indexOf(inputChar) < 0) {
                 System.out.println("Invalid choice.");
             } else {
                 choiceIsNotValid = false;
             }
         }
-        return inputs;
+        return userInput;
     }
 
-    public static String enterInputs() {
+    public static String readInput() {
         Scanner input = new Scanner(System.in);
         System.out.print("Please make a choice > ");
         return input.nextLine();
@@ -88,6 +92,12 @@ public class Main {
 
     public static void substituteCmd(String input) {
         System.out.println("you have chosen \"Substitue\".");
+        String[] inputs = input.split("/");
+        if (inputs.length != 3) {
+            System.out.println("Invalid input for locate.");
+        } else {
+            System.out.println("you have chosen \"Locate\" with inputs: \"" + inputs[1] + "\" & \"" + inputs[2] + "\".");
+        }
     }
 
     private static void copyCmd(String input) {
@@ -95,7 +105,12 @@ public class Main {
     }
 
     public static void locateCmd(String input) {
-        System.out.println("you have chosen \"Locate\".");
+        String[] inputs = input.split("/");
+        if (inputs.length != 2) {
+            System.out.println("Invalid input for locate.");
+        } else {
+            System.out.println("you have chosen \"Locate\" with input: \"" + inputs[1] + "\".");
+        }
     }
 
     public static void deleteCmd(String input) {
