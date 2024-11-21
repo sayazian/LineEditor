@@ -23,7 +23,7 @@ public class Main {
     private static void readFileLines(String filePath) throws FileNotFoundException {
         File theFile = new File(filePath);
         Scanner input = new Scanner(theFile);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < fileLines.length; i++) {
             if (input.hasNextLine()) fileLines[i] = input.nextLine();
         }
     }
@@ -180,21 +180,25 @@ public class Main {
     }
 
     private static void printTheFile() {
-        for (int i = 0; i < 100; i++) {
-            if (!(fileLines[i] == null)) System.out.println(fileLines[i]);
+        for (String fileLine : fileLines) {
+            if (!(fileLine == null)) System.out.println(fileLine);
         }
+        for (String fileLine : fileLines) if (!(fileLine == null)) System.out.println(fileLine);
     }
 
     private static void insertTheNewLines(String[] newLines) {
-        insertTheNewLines(newLines, fileLines, currentLineNumber);
+        insertTheNewLines(fileLines, newLines, currentLineNumber);
     }
 
-    private static void insertTheNewLines(String[] newLines, String[] fileLines, int currentLineNumber) {
-        String[] temp = new String[fileLines.length - currentLineNumber];
-        for (int i = 0; i < (100 - currentLineNumber); i++) temp[i] = fileLines[currentLineNumber + i];
-        for (int i = 0; i < newLines.length; i++) fileLines[currentLineNumber + i] = newLines[i];
-        for (int i = 0; i < (100 - currentLineNumber - newLines.length); i++)
-            fileLines[currentLineNumber + newLines.length + i] = temp[i];
+    public static void insertTheNewLines(String[] fileLines, String[] newLines, int currentLineNumber) {
+        String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber, fileLines.length);
+        if ((currentLineNumber + newLines.length) < fileLines.length) {
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber, newLines.length);
+            System.arraycopy(temp,0,fileLines,currentLineNumber + newLines.length, fileLines.length - currentLineNumber - newLines.length);
+        } else {
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber, fileLines.length - currentLineNumber);
+        }
+
     }
 
 
@@ -226,9 +230,7 @@ public class Main {
 
     private static void saveTheFile() throws FileNotFoundException {
         PrintWriter output = new PrintWriter(filePath);
-        for (int i = 0; i < 100; i++) {
-            if (!(fileLines[i] == null)) output.println(fileLines[i]);
-        }
+        for (String fileLine : fileLines) if (!(fileLine == null)) output.println(fileLine);
         output.close();
     }
 
