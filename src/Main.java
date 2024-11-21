@@ -134,31 +134,45 @@ public class Main {
     }
 
     public static void tryMoveCommand(String input) {
-        int number = getLineNumber(input);
-        if (number > 0) runMoveCommand(number);
-        else System.out.println("Invalid input for \"Move\".");
+        int number = getMoveLineNumber(input);
+        if (number == 200) System.out.println("Invalid input for \"Move\".");
+        else runMoveCommand(number);
+        System.out.println("Current line number is #" + currentLineNumber);
     }
 
     private static void runMoveCommand(int number) {
         currentLineNumber = currentLineNumber + number;
-        if (!(fileLines[currentLineNumber - 1] == null)) System.out.println(fileLines[currentLineNumber - 1]);
+        if ((currentLineNumber < 1) || (currentLineNumber > 100)) {
+            currentLineNumber = currentLineNumber - number;
+            System.out.println("Destination is out of range.");
+            return;
+        }
+        if (!(fileLines[currentLineNumber - 1] == null)) {
+            System.out.println(fileLines[currentLineNumber - 1]);
+
+        }
         else {
             System.out.println("The line #" + currentLineNumber + " is empty.");
-            System.out.println("Current line is set to the number before running \"Type\" command.");
             currentLineNumber = currentLineNumber - number;
         }
     }
 
     public static void tryTypeCommand(String input) {
         int number = getLineNumber(input);
-        if (number > 0) runTypeCommand(number);
+        if (number >= 0) runTypeCommand(number);
         else System.out.println("Invalid input for \"Type\".");
     }
 
     private static void runTypeCommand(int number) {
-        for (int i = currentLineNumber - 1; i < currentLineNumber + number - 1; i++) {
-            if (!(fileLines[i] == null)) System.out.println(fileLines[i]);
+        if ((currentLineNumber + number) < fileLines.length) {
+            for (int i = currentLineNumber - 1; i <= currentLineNumber + number - 1; i++) {
+                if (!(fileLines[i] == null)) System.out.println(fileLines[i]);
+            }
+            currentLineNumber = currentLineNumber + number;
+        } else {
+            System.out.println("The number is too large.");
         }
+        System.out.println("The current line number is #" + currentLineNumber);
     }
 
     public static void tryPasteCommand() {
@@ -194,7 +208,7 @@ public class Main {
         String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber, fileLines.length);
         if ((currentLineNumber + newLines.length) < fileLines.length) {
             System.arraycopy(newLines, 0, fileLines, currentLineNumber, newLines.length);
-            System.arraycopy(temp,0,fileLines,currentLineNumber + newLines.length, fileLines.length - currentLineNumber - newLines.length);
+            System.arraycopy(temp, 0, fileLines, currentLineNumber + newLines.length, fileLines.length - currentLineNumber - newLines.length);
         } else {
             System.arraycopy(newLines, 0, fileLines, currentLineNumber, fileLines.length - currentLineNumber);
         }
@@ -205,7 +219,7 @@ public class Main {
     public static String[] enterInsertLines(int number) {
         Scanner input = new Scanner(System.in);
         String[] newLines = new String[number];
-        System.out.println("Please enter " + number + " lines > ");
+        System.out.print("Please enter " + number + " lines > ");
         for (int i = 0; i < number; i++) {
             newLines[i] = input.nextLine();
         }
@@ -240,11 +254,30 @@ public class Main {
         return isNumeric(inputs[1]) ? Integer.parseInt(inputs[1]) : -1;
     }
 
-    public static boolean isNumeric(String input) {
+    private static int getMoveLineNumber(String input) {
+        String[] inputs = input.split(" ");
+        int start = 0;
+        int sign = 1;
+        if (inputs.length != 2) return -1;
+        if (isNumericSigned(inputs[1])) {
+            if (inputs[1].charAt(0) == '-') {
+                start = 1;
+                sign = -1;
+            }
+            return sign * Integer.parseInt(inputs[1].substring(start));
+        } else return 200;
+    }
+
+    public static boolean isNumeric (String input){
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) < '0' || input.charAt(i) > '9') return false;
         }
         return true;
     }
 
+    public static boolean isNumericSigned (String input){
+        int start = 0;
+        if (input.charAt(0) == '-') start = 1;
+        return isNumeric(input.substring(start));
+    }
 }
