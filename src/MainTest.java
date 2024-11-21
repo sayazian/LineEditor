@@ -21,16 +21,6 @@ class MainTest {
         assertFalse(Main.isNumeric(input));
     }
 
-//    @ParameterizedTest
-//    @CsvSource({
-//            "{\"line 1\", \"insertion 1\", \"insertion 2\",  \"line 2\", \"line 3\", \"line 4\", \"line 5\"},{\"insertion 1\", \"insertion 2\"}"
-//    })
-//    void insertTheNewLines(String[] input, String[] expected) {
-//        int lineNumber = 2;
-//        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
-//        Main.insertTheNewLines(fileLines, input, lineNumber);
-//        assertEquals(expected, fileLines);
-//    }
     @Test
     void insertTheNewLines() {
         String[] input = {"insertion 1", "insertion 2"};
