@@ -127,12 +127,24 @@ public class Main {
 
     public static void tryDeleteCommand(String input) {
         int number = getLineNumber(input);
+        int validNumber = getNumberOfValidLines(fileLines);
+        if (currentLineNumber + number > validNumber) {
+            System.out.println("The number is too big. The file has " + validNumber + " lines.");
+            return;
+        }
         if (number > 0) runDeleteCommand(number);
         else System.out.println("Invalid input for \"Delete\".");
     }
 
     private static void runDeleteCommand(int number) {
-        System.out.println("You have chosen to \"Delete\" line #" + number + ".");
+        runDeleteCommand(fileLines, currentLineNumber, number);
+    }
+
+    public static void runDeleteCommand(String[] fileLines, int currentLineNumber, int number) {
+        int validLines = getNumberOfValidLines(fileLines);
+        int newValidLines = validLines - number;
+        System.arraycopy(fileLines, currentLineNumber + number - 1, fileLines, currentLineNumber - 1, newValidLines - currentLineNumber + 1 );
+        Arrays.fill(fileLines, newValidLines ,fileLines.length  , null );
     }
 
     public static void tryMoveCommand(String input) {
@@ -212,7 +224,7 @@ public class Main {
     private static void runInsertCommand(int number) {
         String[] newLines = enterInsertLines(number);
         insertTheNewLines(newLines);
-        currentLineNumber = currentLineNumber + number -1;
+        currentLineNumber = currentLineNumber + number - 1;
     }
 
     private static void insertTheNewLines(String[] newLines) {

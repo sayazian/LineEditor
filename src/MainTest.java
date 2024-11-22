@@ -52,4 +52,44 @@ class MainTest {
         Main.replaceWithNewLines(fileLines, input, lineNumber);
         assertArrayEquals(expected, fileLines);
     }
+   @Test
+    void deleteLines1() {
+        int currentLineNumber = 2;
+        int numberOfLinesToDelete = 1;
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        String[] expected = {"line 1", "line 3", "line 4", "line 5", null};
+        deleteTheLines(fileLines, expected, currentLineNumber, numberOfLinesToDelete);
+    }
+
+   @Test
+    void deleteLines2() {
+        int currentLineNumber = 5;
+        int numberOfLinesToDelete = 1;
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        String[] expected = {"line 1", "line 2", "line 3", "line 4", null};
+        deleteTheLines(fileLines, expected, currentLineNumber, numberOfLinesToDelete);
+    }
+
+    @Test
+    void deleteLines3() {
+        int currentLineNumber = 1;
+        int numberOfLinesToDelete = 5;
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        String[] expected = {null, null, null, null, null};
+        deleteTheLines(fileLines, expected, currentLineNumber, numberOfLinesToDelete);
+    }
+
+    @Test
+    void deleteLines4() {
+        int currentLineNumber = 1;
+        int numberOfLinesToDelete = 0;
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        String[] expected = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        deleteTheLines(fileLines, expected, currentLineNumber, numberOfLinesToDelete);
+    }
+
+    void deleteTheLines(String[] fileLines, String[] expected, int currentLineNumber, int numberOfLinesToDelete) {
+        Main.runDeleteCommand(fileLines,currentLineNumber, numberOfLinesToDelete);
+        assertArrayEquals(expected, fileLines);
+    }
 }
