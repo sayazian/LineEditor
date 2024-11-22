@@ -122,7 +122,21 @@ public class Main {
     }
 
     private static void runLocateCommand(String input) {
-        System.out.println("You have chosen \"Locate\" with input: \"" + input + "\".");
+        int lineNumber = runLocateCommand(fileLines, currentLineNumber, input);
+        if (lineNumber < 0 ) {
+            System.out.println("The input String does not exist after this point.");
+        } else {
+            System.out.println("The input String occurs in line " + lineNumber);
+            currentLineNumber = lineNumber;
+        }
+    }
+
+    public static int runLocateCommand(String[] fileLines, int currentLineNumber, String input) {
+        int validLines = getNumberOfValidLines(fileLines);
+        for (int i = currentLineNumber - 1; i < validLines; i++) {
+            if (fileLines[i].indexOf(input) >= 0) return i+1;
+        }
+        return -1;
     }
 
     public static void tryDeleteCommand(String input) {
@@ -143,8 +157,8 @@ public class Main {
     public static void runDeleteCommand(String[] fileLines, int currentLineNumber, int number) {
         int validLines = getNumberOfValidLines(fileLines);
         int newValidLines = validLines - number;
-        System.arraycopy(fileLines, currentLineNumber + number - 1, fileLines, currentLineNumber - 1, newValidLines - currentLineNumber + 1 );
-        Arrays.fill(fileLines, newValidLines ,fileLines.length  , null );
+        System.arraycopy(fileLines, currentLineNumber + number - 1, fileLines, currentLineNumber - 1, newValidLines - currentLineNumber + 1);
+        Arrays.fill(fileLines, newValidLines, fileLines.length, null);
     }
 
     public static void tryMoveCommand(String input) {

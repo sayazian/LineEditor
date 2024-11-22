@@ -4,6 +4,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -91,5 +92,20 @@ class MainTest {
     void deleteTheLines(String[] fileLines, String[] expected, int currentLineNumber, int numberOfLinesToDelete) {
         Main.runDeleteCommand(fileLines,currentLineNumber, numberOfLinesToDelete);
         assertArrayEquals(expected, fileLines);
+    }
+
+    @Test
+    void locateString() {
+        int currentLineNumber = 1;
+        int numberOfLinesToDelete = 0;
+        String input = "6";
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        int expected = -1;
+        locateStringLine(fileLines, currentLineNumber, input, expected);
+    }
+
+    void locateStringLine(String[] fileLines, int currentLineNumber, String input, int expectedLine) {
+        int line = Main.runLocateCommand(fileLines,currentLineNumber, input );
+        assertEquals(expectedLine, line);
     }
 }
