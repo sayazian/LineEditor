@@ -150,8 +150,7 @@ public class Main {
         if (!(fileLines[currentLineNumber - 1] == null)) {
             System.out.println(fileLines[currentLineNumber - 1]);
 
-        }
-        else {
+        } else {
             System.out.println("The line #" + currentLineNumber + " is empty.");
             currentLineNumber = currentLineNumber - number;
         }
@@ -182,7 +181,7 @@ public class Main {
 
     public static void tryInsertCommand(String input) {
         int number = getLineNumber(input);
-        if (number > 0) runInsertCommand(number);
+        if ((number > 0) && (number <= fileLines.length - currentLineNumber)) runInsertCommand(number);
         else System.out.println("Invalid input for \"Insert\".");
     }
 
@@ -212,9 +211,7 @@ public class Main {
         } else {
             System.arraycopy(newLines, 0, fileLines, currentLineNumber, fileLines.length - currentLineNumber);
         }
-
     }
-
 
     public static String[] enterInsertLines(int number) {
         Scanner input = new Scanner(System.in);
@@ -229,12 +226,27 @@ public class Main {
 
     public static void tryReplaceCommand(String input) {
         int number = getLineNumber(input);
-        if (number > 0) runReplaceCommand(number);
+        if (number <= fileLines.length - currentLineNumber + 1) runReplaceCommand(number);
         else System.out.println("Invalid input for \"Replace\".");
     }
 
     private static void runReplaceCommand(int number) {
-        System.out.println("You have chosen to \"Replace\" line #" + number + ".");
+        String[] newLines = enterInsertLines(number);
+        replaceWithNewLines(newLines);
+        currentLineNumber = currentLineNumber + number;
+        printTheFile();
+    }
+
+    private static void replaceWithNewLines(String[] newLines) {
+        replaceWithNewLines(fileLines, newLines, currentLineNumber);
+    }
+
+    public static void replaceWithNewLines(String[] fileLines, String[] newLines, int currentLineNumber) {
+        if (newLines.length <= (fileLines.length - currentLineNumber + 1)) {
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1,newLines.length);
+        } else {
+            System.out.println("Invalid number of lines.");
+        }
     }
 
     public static void tryQuitCommand() throws FileNotFoundException {
@@ -268,14 +280,14 @@ public class Main {
         } else return 200;
     }
 
-    public static boolean isNumeric (String input){
+    public static boolean isNumeric(String input) {
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) < '0' || input.charAt(i) > '9') return false;
         }
         return true;
     }
 
-    public static boolean isNumericSigned (String input){
+    public static boolean isNumericSigned(String input) {
         int start = 0;
         if (input.charAt(0) == '-') start = 1;
         return isNumeric(input.substring(start));

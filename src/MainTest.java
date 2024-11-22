@@ -36,4 +36,20 @@ class MainTest {
         Main.insertTheNewLines(fileLines, input, lineNumber);
         assertArrayEquals(expected, fileLines);
     }
+
+    @Test
+    void replaceTheNewLines() {
+        String[] input = {"replacing 1", "replacing 2"};
+        String[] expected = {"line 1", "line 2", "replacing 1", "replacing 2", "line 5"};
+        replaceTheNewLines(input, expected);
+    }
+
+    void replaceTheNewLines(String[] input, String[] expected) {
+        int lineNumber = 3;
+        String[] fileLines = new String[5];
+        String[] constant = {"line 1", "line 2", "line 3", "line 4", "line 5"};
+        System.arraycopy(constant, 0, fileLines,0,5);
+        Main.replaceWithNewLines(fileLines, input, lineNumber);
+        assertArrayEquals(expected, fileLines);
+    }
 }
