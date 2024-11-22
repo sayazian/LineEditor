@@ -68,6 +68,8 @@ public class Main {
                 System.out.println("Invalid choice.");
                 break;
         }
+        System.out.println("The current line is: " + currentLineNumber);
+        System.out.println("The number of lines is: " + getNumberOfValidLines(fileLines));
         return continued;
     }
 
@@ -137,7 +139,6 @@ public class Main {
         int number = getMoveLineNumber(input);
         if (number == 200) System.out.println("Invalid input for \"Move\".");
         else runMoveCommand(number);
-        System.out.println("Current line number is #" + currentLineNumber);
     }
 
     private static void runMoveCommand(int number) {
@@ -158,6 +159,11 @@ public class Main {
 
     public static void tryTypeCommand(String input) {
         int number = getLineNumber(input);
+        int validNumber = getNumberOfValidLines(fileLines);
+        if (currentLineNumber + number > validNumber) {
+            System.out.println("The number is too big. The file has " + validNumber + " lines.");
+            return;
+        }
         if (number > 0) runTypeCommand(number);
         else System.out.println("Invalid input for \"Type\".");
     }
@@ -180,7 +186,15 @@ public class Main {
         } else {
             System.out.println("The number is too large.");
         }
-        System.out.println("The current line number is #" + currentLineNumber);
+    }
+
+    private static int getNumberOfValidLines(String[] fileLines) {
+        int validLines = 0;
+        for (String fileLine : fileLines) {
+            if (!(fileLine == null)) validLines++;
+            if (fileLine == null) break;
+        }
+        return validLines;
     }
 
     public static void tryPasteCommand() {
@@ -190,22 +204,15 @@ public class Main {
 
     public static void tryInsertCommand(String input) {
         int number = getLineNumber(input);
-        if ((number > 0) && (number <= fileLines.length - currentLineNumber)) runInsertCommand(number);
+        int validLines = getNumberOfValidLines(fileLines);
+        if ((number > 0) && (number <= fileLines.length - validLines)) runInsertCommand(number);
         else System.out.println("Invalid input for \"Insert\".");
     }
 
     private static void runInsertCommand(int number) {
         String[] newLines = enterInsertLines(number);
         insertTheNewLines(newLines);
-        currentLineNumber = currentLineNumber + number;
-        printTheFile();
-    }
-
-    private static void printTheFile() {
-        for (String fileLine : fileLines) {
-            if (!(fileLine == null)) System.out.println(fileLine);
-        }
-        for (String fileLine : fileLines) if (!(fileLine == null)) System.out.println(fileLine);
+        currentLineNumber = currentLineNumber + number -1;
     }
 
     private static void insertTheNewLines(String[] newLines) {
@@ -213,10 +220,11 @@ public class Main {
     }
 
     public static void insertTheNewLines(String[] fileLines, String[] newLines, int currentLineNumber) {
-        String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber - 1, fileLines.length);
+        int validLines = getNumberOfValidLines(fileLines);
+        String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber - 1, validLines);
         if ((currentLineNumber + newLines.length) < fileLines.length) {
             System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1, newLines.length);
-            System.arraycopy(temp, 0, fileLines, currentLineNumber + newLines.length - 1, fileLines.length - currentLineNumber - 1);
+            System.arraycopy(temp, 0, fileLines, currentLineNumber + newLines.length - 1, validLines - currentLineNumber + 1);
         } else {
             System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1, fileLines.length - currentLineNumber + 1);
         }
@@ -229,7 +237,6 @@ public class Main {
         for (int i = 0; i < number; i++) {
             newLines[i] = input.nextLine();
         }
-        System.out.println("You have entered: " + Arrays.toString(newLines));
         return newLines;
     }
 
@@ -242,8 +249,7 @@ public class Main {
     private static void runReplaceCommand(int number) {
         String[] newLines = enterInsertLines(number);
         replaceWithNewLines(newLines);
-        currentLineNumber = currentLineNumber + number;
-        printTheFile();
+        currentLineNumber = currentLineNumber + number - 1;
     }
 
     private static void replaceWithNewLines(String[] newLines) {
