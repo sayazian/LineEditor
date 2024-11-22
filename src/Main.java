@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Main {
 
     public static String filePath = "/Users/sahar/IdeaProjects/LineEditor/src/file.txt";
-    public static int currentLineNumber = 3;
+    public static int currentLineNumber = 1;
     public static String[] fileLines = new String[100];
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -158,16 +158,25 @@ public class Main {
 
     public static void tryTypeCommand(String input) {
         int number = getLineNumber(input);
-        if (number >= 0) runTypeCommand(number);
+        if (number > 0) runTypeCommand(number);
         else System.out.println("Invalid input for \"Type\".");
     }
 
     private static void runTypeCommand(int number) {
+        int typedLines = 0;
         if ((currentLineNumber + number) < fileLines.length) {
-            for (int i = currentLineNumber - 1; i <= currentLineNumber + number - 1; i++) {
-                if (!(fileLines[i] == null)) System.out.println(fileLines[i]);
+            for (int i = currentLineNumber - 1; i <= currentLineNumber + number - 2; i++) {
+                if (!(fileLines[i] == null)) {
+                    System.out.println(fileLines[i]);
+                    typedLines++;
+                }
+                if (fileLines[i] == null) {
+                    System.out.println("*** Here is the end of the file. ***");
+                    break;
+                }
             }
-            currentLineNumber = currentLineNumber + number;
+            currentLineNumber = currentLineNumber + typedLines - 1;
+
         } else {
             System.out.println("The number is too large.");
         }
@@ -204,12 +213,12 @@ public class Main {
     }
 
     public static void insertTheNewLines(String[] fileLines, String[] newLines, int currentLineNumber) {
-        String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber, fileLines.length);
+        String[] temp = Arrays.copyOfRange(fileLines, currentLineNumber - 1, fileLines.length);
         if ((currentLineNumber + newLines.length) < fileLines.length) {
-            System.arraycopy(newLines, 0, fileLines, currentLineNumber, newLines.length);
-            System.arraycopy(temp, 0, fileLines, currentLineNumber + newLines.length, fileLines.length - currentLineNumber - newLines.length);
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1, newLines.length);
+            System.arraycopy(temp, 0, fileLines, currentLineNumber + newLines.length - 1, fileLines.length - currentLineNumber - 1);
         } else {
-            System.arraycopy(newLines, 0, fileLines, currentLineNumber, fileLines.length - currentLineNumber);
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1, fileLines.length - currentLineNumber + 1);
         }
     }
 
@@ -243,7 +252,7 @@ public class Main {
 
     public static void replaceWithNewLines(String[] fileLines, String[] newLines, int currentLineNumber) {
         if (newLines.length <= (fileLines.length - currentLineNumber + 1)) {
-            System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1,newLines.length);
+            System.arraycopy(newLines, 0, fileLines, currentLineNumber - 1, newLines.length);
         } else {
             System.out.println("Invalid number of lines.");
         }
@@ -270,7 +279,7 @@ public class Main {
         String[] inputs = input.split(" ");
         int start = 0;
         int sign = 1;
-        if (inputs.length != 2) return -1;
+        if (inputs.length != 2) return 200;
         if (isNumericSigned(inputs[1])) {
             if (inputs[1].charAt(0) == '-') {
                 start = 1;

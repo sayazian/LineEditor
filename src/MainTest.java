@@ -24,7 +24,7 @@ class MainTest {
     @Test
     void insertTheNewLines() {
         String[] input = {"insertion 1", "insertion 2"};
-        String[] expected = {"line 1", "line 2", "insertion 1", "insertion 2", "line 3", "line 4", "line 5"};
+        String[] expected = {"line 1", "insertion 1", "insertion 2", "line 2", "line 3", "line 4", "line 5"};
         insertTheNewLines(input, expected);
     }
 
