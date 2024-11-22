@@ -97,7 +97,6 @@ class MainTest {
     @Test
     void locateString() {
         int currentLineNumber = 1;
-        int numberOfLinesToDelete = 0;
         String input = "6";
         String[] fileLines = {"line 1", "line 2", "line 3", "line 4", "line 5"};
         int expected = -1;

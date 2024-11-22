@@ -134,7 +134,7 @@ public class Main {
     public static int runLocateCommand(String[] fileLines, int currentLineNumber, String input) {
         int validLines = getNumberOfValidLines(fileLines);
         for (int i = currentLineNumber - 1; i < validLines; i++) {
-            if (fileLines[i].indexOf(input) >= 0) return i+1;
+            if (fileLines[i].contains(input)) return i+1;
         }
         return -1;
     }
