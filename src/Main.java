@@ -99,8 +99,17 @@ public class Main {
         else runSubstituteCommand(inputs[1], inputs[2]);
     }
 
-    private static void runSubstituteCommand(String substituted, String replacing) {
-        System.out.println("You have chosen \"substitute\" with inputs: \"" + substituted + "\" & \"" + replacing + "\".");
+    private static void runSubstituteCommand(String oldString, String newString) {
+        runSubstituteCommand(fileLines, currentLineNumber, oldString, newString);
+    }
+
+    private static void runSubstituteCommand(String[] fileLines, int currentLineNumber, String oldString, String newString) {
+        if (fileLines[currentLineNumber - 1].contains(oldString)) {
+            fileLines[currentLineNumber - 1] = fileLines[currentLineNumber - 1].replace(oldString, newString);
+            System.out.println("Current Line: " + fileLines[currentLineNumber - 1] + ".");
+        } else {
+            System.out.println("The input String \"" + oldString + "\" does not exist in the current line.");
+        }
     }
 
     private static void tryCopyCommand(String input) {
@@ -123,7 +132,7 @@ public class Main {
 
     private static void runLocateCommand(String input) {
         int lineNumber = runLocateCommand(fileLines, currentLineNumber, input);
-        if (lineNumber < 0 ) {
+        if (lineNumber < 0) {
             System.out.println("The input String does not exist after this point.");
         } else {
             System.out.println("The input String occurs in line " + lineNumber);
@@ -134,7 +143,7 @@ public class Main {
     public static int runLocateCommand(String[] fileLines, int currentLineNumber, String input) {
         int validLines = getNumberOfValidLines(fileLines);
         for (int i = currentLineNumber - 1; i < validLines; i++) {
-            if (fileLines[i].contains(input)) return i+1;
+            if (fileLines[i].contains(input)) return i + 1;
         }
         return -1;
     }
@@ -268,7 +277,7 @@ public class Main {
 
     public static void tryReplaceCommand(String input) {
         int number = getLineNumber(input);
-        if (number <= fileLines.length - currentLineNumber + 1) runReplaceCommand(number);
+        if ((number > -1) && (number <= fileLines.length - currentLineNumber + 1)) runReplaceCommand(number);
         else System.out.println("Invalid input for \"Replace\".");
     }
 
