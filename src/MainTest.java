@@ -3,6 +3,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,7 +35,7 @@ class MainTest {
         int lineNumber = 2;
         String[] fileLines = new String[7];
         String[] constant = {"line 1", "line 2", "line 3", "line 4", "line 5"};
-        System.arraycopy(constant, 0, fileLines,0,5);
+        System.arraycopy(constant, 0, fileLines, 0, 5);
         Main.insertTheNewLines(fileLines, input, lineNumber);
         assertArrayEquals(expected, fileLines);
     }
@@ -49,11 +51,12 @@ class MainTest {
         int lineNumber = 3;
         String[] fileLines = new String[5];
         String[] constant = {"line 1", "line 2", "line 3", "line 4", "line 5"};
-        System.arraycopy(constant, 0, fileLines,0,5);
+        System.arraycopy(constant, 0, fileLines, 0, 5);
         Main.replaceWithNewLines(fileLines, input, lineNumber);
         assertArrayEquals(expected, fileLines);
     }
-   @Test
+
+    @Test
     void deleteLines1() {
         int currentLineNumber = 2;
         int numberOfLinesToDelete = 1;
@@ -62,7 +65,7 @@ class MainTest {
         deleteTheLines(fileLines, expected, currentLineNumber, numberOfLinesToDelete);
     }
 
-   @Test
+    @Test
     void deleteLines2() {
         int currentLineNumber = 5;
         int numberOfLinesToDelete = 1;
@@ -90,7 +93,7 @@ class MainTest {
     }
 
     void deleteTheLines(String[] fileLines, String[] expected, int currentLineNumber, int numberOfLinesToDelete) {
-        Main.runDeleteCommand(fileLines,currentLineNumber, numberOfLinesToDelete);
+        Main.runDeleteCommand(fileLines, currentLineNumber, numberOfLinesToDelete);
         assertArrayEquals(expected, fileLines);
     }
 
@@ -103,8 +106,73 @@ class MainTest {
         locateStringLine(fileLines, currentLineNumber, input, expected);
     }
 
+    @Test
+    void locateStringSpecialChar() {
+        int currentLineNumber = 1;
+        String input = "/";
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4/", "line 5"};
+        int expected = 4;
+        locateStringLine(fileLines, currentLineNumber, input, expected);
+    }
+
     void locateStringLine(String[] fileLines, int currentLineNumber, String input, int expectedLine) {
-        int line = Main.runLocateCommand(fileLines,currentLineNumber, input );
+        int line = Main.runLocateCommand(fileLines, currentLineNumber, input);
         assertEquals(expectedLine, line);
+    }
+
+    @Test
+    void substitueSpecialChar() {
+        int currentLineNumber = 4;
+        String oldString = "/";
+        String newString = "S";
+        String[] fileLines = {"line 1", "line 2", "line 3", "line 4/", "line 5"};
+        String[] expected = {"line 1", "line 2", "line 3", "line 4S", "line 5"};
+        substituteStringLine(fileLines, expected, currentLineNumber, oldString, newString);
+    }
+
+    void substituteStringLine(String[] fileLines, String[] expected, int currentLineNumber, String oldString, String newString) {
+        Main.runSubstituteCommand(fileLines, currentLineNumber, oldString, newString);
+        assertArrayEquals(expected, fileLines);
+    }
+
+    @Test
+    void substituteCommandValidationTest() {
+        runSubstituteCommandValidation("s/a/b/", true);
+        runSubstituteCommandValidation("s/a//", true);
+        runSubstituteCommandValidation("s/\\a/b/", true);
+        runSubstituteCommandValidation("s//b/", true);
+        runSubstituteCommandValidation("s/\\//\\/\\//", true);
+        runSubstituteCommandValidation("ssdfg/a/b/", true);
+        runSubstituteCommandValidation("s/a\\\\/b/", true);
+        runSubstituteCommandValidation("s/a\\/b/", false);
+        runSubstituteCommandValidation("s/a/b/\\", false);
+        runSubstituteCommandValidation("s/a/b\\/", false);
+        runSubstituteCommandValidation("s/a//b/", false);
+        runSubstituteCommandValidation("s//a/b/", false);
+        runSubstituteCommandValidation("s\\/a/b/", false);
+        runSubstituteCommandValidation("s/ab/", false);
+        runSubstituteCommandValidation("s/a\\\\\\/b/", false);
+    }
+
+    void runSubstituteCommandValidation(String input, boolean expected) {
+        boolean isValid = Main.substituteCommandIsValid(input);
+        assertEquals(expected, isValid);
+    }
+
+    @Test
+    void getSubstituteStringsNew() {
+        runGetSubstitueStrings("s/a/b/", "a", "b");
+        runGetSubstitueStrings("s/asdf//", "asdf", "");
+        runGetSubstitueStrings("s/\\//\\\\/", "/", "\\");
+        runGetSubstitueStrings("s/\\\\/\\//", "\\", "/");
+        runGetSubstitueStrings("s/\\/uu\\//xx/", "/uu/", "xx");
+        runGetSubstitueStrings("s//asdf/", "", "asdf");
+        runGetSubstitueStrings("s/ \\/,/ \\./", " /,", " .");
+    }
+
+    void runGetSubstitueStrings(String input, String expectedOldString, String expectedNewString) {
+        String[] inputs = Main.getSubstituteStrings(input);
+        assertEquals(expectedOldString, inputs[0]);
+        assertEquals(expectedNewString, inputs[1]);
     }
 }

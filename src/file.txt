@@ -9,4 +9,5 @@ Here are strange chars: ñ ø ü é
 This goes after odd chars
 I Love
 You!
+This line includes /.
 Hello!∑

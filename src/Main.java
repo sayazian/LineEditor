@@ -6,17 +6,19 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static String filePath = "/Users/sahar/IdeaProjects/LineEditor/src/file.txt";
+    //    public static String filePath = "/Users/sahar/IdeaProjects/LineEditor/src/file.txt";
     public static int currentLineNumber = 1;
     public static String[] fileLines = new String[100];
+    public static String tempFilePath = "/Users/sahar/IdeaProjects/LineEditor/src/temp.txt";
 
     public static void main(String[] args) throws FileNotFoundException {
+        String filePath = args[0];
         readFileLines(filePath);
         boolean continued = true;
         showOptions();
         while (continued) {
             String userInput = readInput();
-            continued = runAction(userInput);
+            continued = runAction(userInput, filePath);
         }
     }
 
@@ -28,7 +30,7 @@ public class Main {
         }
     }
 
-    private static boolean runAction(String userInput) throws FileNotFoundException {
+    private static boolean runAction(String userInput, String filePath) throws FileNotFoundException {
         char currentCommand = getCurrentCommand(userInput);
         boolean continued = true;
 
@@ -61,7 +63,7 @@ public class Main {
                 tryReplaceCommand(userInput);
                 break;
             case 'q':
-                tryQuitCommand();
+                tryQuitCommand(filePath);
                 continued = false;
                 break;
             default:
@@ -93,23 +95,80 @@ public class Main {
     }
 
     public static void trySubstituteCommand(String input) {
-        String[] inputs = input.split("/");
-        if ((inputs.length != 3) || (input.charAt(input.length() - 1) != '/'))
+        if (!substituteCommandIsValid(input)) {
             System.out.println("Invalid input for substitute.");
-        else runSubstituteCommand(inputs[1], inputs[2]);
+        }
+        else {
+            String[] inputs = getSubstituteStrings(input);
+            runSubstituteCommand(fileLines, currentLineNumber, inputs[0], inputs[1]);
+        }
     }
 
-    private static void runSubstituteCommand(String oldString, String newString) {
-        runSubstituteCommand(fileLines, currentLineNumber, oldString, newString);
+    public static boolean substituteCommandIsValid(String input) {
+        int numberOfFreeSlashes = 0;
+        int index = 0;
+        boolean lastThingSeenIsSlash = false;
+
+        while (index < input.length()) {
+            if (input.charAt(index) == '/') {
+                numberOfFreeSlashes++;
+                lastThingSeenIsSlash = true;
+            } else if (input.charAt(index) == '\\') {
+                index++;
+                lastThingSeenIsSlash = false;
+            }
+            index++;
+        }
+        if ((numberOfFreeSlashes == 3) && lastThingSeenIsSlash) {
+            return true;
+        } else return false;
     }
 
-    private static void runSubstituteCommand(String[] fileLines, int currentLineNumber, String oldString, String newString) {
-        if (fileLines[currentLineNumber - 1].contains(oldString)) {
-            fileLines[currentLineNumber - 1] = fileLines[currentLineNumber - 1].replace(oldString, newString);
-            System.out.println("Current Line: " + fileLines[currentLineNumber - 1] + ".");
+    public static String[] getSubstituteStrings(String input) {
+        int[] indexes = new int[input.length()];
+        String[] substituteStrings = new String[2];
+        StringBuilder newInput = new StringBuilder();
+        int pos = 0;
+        int index = 0;
+        while (index < input.length()) {
+            if (input.charAt(index) == '/') {
+                indexes[pos] = index;
+                pos++;
+            } else if (input.charAt(index) == '\\') {
+                index++;
+            }
+            index++;
+        }
+        substituteStrings[0] = removeExtraBackSlashes(input.substring(indexes[0] + 1, indexes[1]));
+        substituteStrings[1] = removeExtraBackSlashes(input.substring(indexes[1] + 1, indexes[2]));
+        return substituteStrings;
+    }
+
+    public static void runSubstituteCommand(String[] fileLines, int currentLineNumber, String oldString, String newString) {
+        String newOldString = oldString;
+        String newNewString = newString;
+        if (oldString.indexOf('\\') >= 0) newOldString = removeExtraBackSlashes(oldString);
+        if (newString.indexOf('\\') >= 0) newNewString = removeExtraBackSlashes(newString);
+
+        if (fileLines[currentLineNumber - 1].contains(newOldString)) {
+            fileLines[currentLineNumber - 1] = fileLines[currentLineNumber - 1].replace(newOldString, newNewString);
+            System.out.println("Current Line: " + fileLines[currentLineNumber - 1]);
         } else {
             System.out.println("The input String \"" + oldString + "\" does not exist in the current line.");
         }
+    }
+
+    public static String removeExtraBackSlashes(String input) {
+        StringBuilder newInput = new StringBuilder();
+        int index = 0;
+
+        while (index < input.length()) {
+            if (input.charAt(index) == '\\') {
+                index++;
+            } else newInput.append(input.toCharArray()[index]);
+            index++;
+        }
+        return newInput.toString();
     }
 
     private static void tryCopyCommand(String input) {
@@ -119,11 +178,28 @@ public class Main {
     }
 
     private static void runCopyCommand(int number) {
-        System.out.println("You have chosen to \"Copy\" line #" + number + ".");
+        runCopyCommand(fileLines, currentLineNumber, number);
+    }
+
+    public static void runCopyCommand(String[] fileLines, int currentLineNumber, int number) {
+        try {
+            try (PrintWriter clipboard = new PrintWriter(tempFilePath)) {
+                String[] newLines = returnTheCopyLines(fileLines, currentLineNumber, number);
+                clipboard.print(Arrays.toString(newLines));
+                currentLineNumber = currentLineNumber + number;
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static String[] returnTheCopyLines(String[] fileLines, int currentLineNumber, int number) {
+        return new String[]{};
     }
 
     public static void tryLocateCommand(String input) {
-        String[] inputs = input.split("/");
+        String[] inputs = getSubstituteStrings(input);
         boolean hasTwoStrings = inputs.length == 2;
         boolean hasTerminalSlash = input.charAt(input.length() - 1) == '/';
         if (!hasTwoStrings || !hasTerminalSlash) System.out.println("Invalid input for locate.");
@@ -137,6 +213,7 @@ public class Main {
         } else {
             System.out.println("The input String occurs in line " + lineNumber);
             currentLineNumber = lineNumber;
+            System.out.println(fileLines[currentLineNumber - 1]);
         }
     }
 
@@ -195,7 +272,7 @@ public class Main {
     public static void tryTypeCommand(String input) {
         int number = getLineNumber(input);
         int validNumber = getNumberOfValidLines(fileLines);
-        if (currentLineNumber + number > validNumber) {
+        if (currentLineNumber + number - 1 > validNumber) {
             System.out.println("The number is too big. The file has " + validNumber + " lines.");
             return;
         }
@@ -277,11 +354,12 @@ public class Main {
 
     public static void tryReplaceCommand(String input) {
         int number = getLineNumber(input);
-        if ((number > -1) && (number <= fileLines.length - currentLineNumber + 1)) runReplaceCommand(number);
+        int validLines = getNumberOfValidLines(fileLines);
+        if ((number > -1) && (number <= validLines - currentLineNumber + 1)) runReplaceCommand(number);
         else System.out.println("Invalid input for \"Replace\".");
     }
 
-    private static void runReplaceCommand(int number) {
+    public static void runReplaceCommand(int number) {
         String[] newLines = enterInsertLines(number);
         replaceWithNewLines(newLines);
         currentLineNumber = currentLineNumber + number - 1;
@@ -299,12 +377,12 @@ public class Main {
         }
     }
 
-    public static void tryQuitCommand() throws FileNotFoundException {
+    public static void tryQuitCommand(String filePath) throws FileNotFoundException {
         System.out.println("You have chosen \"Quit\".");
-        saveTheFile();
+        saveTheFile(filePath);
     }
 
-    private static void saveTheFile() throws FileNotFoundException {
+    private static void saveTheFile(String filePath) throws FileNotFoundException {
         PrintWriter output = new PrintWriter(filePath);
         for (String fileLine : fileLines) if (!(fileLine == null)) output.println(fileLine);
         output.close();
