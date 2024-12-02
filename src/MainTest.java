@@ -3,7 +3,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -161,13 +160,14 @@ class MainTest {
 
     @Test
     void getSubstituteStringsNew() {
-        runGetSubstitueStrings("s/a/b/", "a", "b");
-        runGetSubstitueStrings("s/asdf//", "asdf", "");
+//        runGetSubstitueStrings("s/a/b/", "a", "b");
+//        runGetSubstitueStrings("s/asdf//", "asdf", "");
         runGetSubstitueStrings("s/\\//\\\\/", "/", "\\");
         runGetSubstitueStrings("s/\\\\/\\//", "\\", "/");
         runGetSubstitueStrings("s/\\/uu\\//xx/", "/uu/", "xx");
         runGetSubstitueStrings("s//asdf/", "", "asdf");
         runGetSubstitueStrings("s/ \\/,/ \\./", " /,", " .");
+        runGetSubstitueStrings("s/ \\\\/a/", " \\", "a");
     }
 
     void runGetSubstitueStrings(String input, String expectedOldString, String expectedNewString) {

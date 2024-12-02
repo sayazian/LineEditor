@@ -6,10 +6,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    //    public static String filePath = "/Users/sahar/IdeaProjects/LineEditor/src/file.txt";
     public static int currentLineNumber = 1;
     public static String[] fileLines = new String[100];
-    public static String tempFilePath = "/Users/sahar/IdeaProjects/LineEditor/src/temp.txt";
 
     public static void main(String[] args) throws FileNotFoundException {
         String filePath = args[0];
@@ -70,6 +68,7 @@ public class Main {
                 System.out.println("Invalid choice.");
                 break;
         }
+        System.out.println("-------------------------------------------------------");
         System.out.println("The current line is: " + currentLineNumber);
         System.out.println("The number of lines is: " + getNumberOfValidLines(fileLines));
         return continued;
@@ -119,101 +118,71 @@ public class Main {
             }
             index++;
         }
-        if ((numberOfFreeSlashes == 3) && lastThingSeenIsSlash) {
-            return true;
-        } else return false;
+        return (numberOfFreeSlashes == 3) && lastThingSeenIsSlash;
     }
 
     public static String[] getSubstituteStrings(String input) {
-        int[] indexes = new int[input.length()];
         String[] substituteStrings = new String[2];
-        StringBuilder newInput = new StringBuilder();
-        int pos = 0;
+        StringBuilder oldString = new StringBuilder();
+        StringBuilder newString = new StringBuilder();
         int index = 0;
+        int numberOfFreeSlashes = 0;
+        boolean justSeenABackSlash = false;
+
         while (index < input.length()) {
-            if (input.charAt(index) == '/') {
-                indexes[pos] = index;
-                pos++;
-            } else if (input.charAt(index) == '\\') {
-                index++;
+            boolean isSlash = isSlash(input.charAt(index));
+            boolean isBackSlash = isBackSlash(input.charAt(index));
+            if (justSeenABackSlash || (!isSlash && !isBackSlash)) {
+                if (numberOfFreeSlashes == 1) oldString.append(input.charAt(index));
+                if (numberOfFreeSlashes == 2) newString.append(input.charAt(index));
+                justSeenABackSlash = false;
+            } else if (isSlash) {
+                numberOfFreeSlashes++;
+            } else {
+                justSeenABackSlash = true;
             }
             index++;
         }
-        substituteStrings[0] = removeExtraBackSlashes(input.substring(indexes[0] + 1, indexes[1]));
-        substituteStrings[1] = removeExtraBackSlashes(input.substring(indexes[1] + 1, indexes[2]));
+        substituteStrings[0] = oldString.toString();
+        substituteStrings[1] = newString.toString();
         return substituteStrings;
     }
 
-    public static void runSubstituteCommand(String[] fileLines, int currentLineNumber, String oldString, String newString) {
-        String newOldString = oldString;
-        String newNewString = newString;
-        if (oldString.indexOf('\\') >= 0) newOldString = removeExtraBackSlashes(oldString);
-        if (newString.indexOf('\\') >= 0) newNewString = removeExtraBackSlashes(newString);
+    public static boolean isSlash(char input) {
+        return (input == '/');
+    }
 
-        if (fileLines[currentLineNumber - 1].contains(newOldString)) {
-            fileLines[currentLineNumber - 1] = fileLines[currentLineNumber - 1].replace(newOldString, newNewString);
+    public static boolean isBackSlash(char input) {
+        return (input == '\\');
+    }
+
+    public static void runSubstituteCommand(String[] fileLines, int currentLineNumber, String oldString, String newString) {
+        if (fileLines[currentLineNumber - 1].contains(oldString)) {
+            fileLines[currentLineNumber - 1] = fileLines[currentLineNumber - 1].replace(oldString, newString);
             System.out.println("Current Line: " + fileLines[currentLineNumber - 1]);
         } else {
             System.out.println("The input String \"" + oldString + "\" does not exist in the current line.");
         }
     }
 
-    public static String removeExtraBackSlashes(String input) {
-        StringBuilder newInput = new StringBuilder();
-        int index = 0;
-
-        while (index < input.length()) {
-            if (input.charAt(index) == '\\') {
-                index++;
-            } else newInput.append(input.toCharArray()[index]);
-            index++;
-        }
-        return newInput.toString();
-    }
-
     private static void tryCopyCommand(String input) {
-        int number = getLineNumber(input);
-        if (number > 0) runCopyCommand(number);
-        else System.out.println("Invalid input for \"Copy\".");
-    }
-
-    private static void runCopyCommand(int number) {
-        runCopyCommand(fileLines, currentLineNumber, number);
-    }
-
-    public static void runCopyCommand(String[] fileLines, int currentLineNumber, int number) {
-        try {
-            try (PrintWriter clipboard = new PrintWriter(tempFilePath)) {
-                String[] newLines = returnTheCopyLines(fileLines, currentLineNumber, number);
-                clipboard.print(Arrays.toString(newLines));
-                currentLineNumber = currentLineNumber + number;
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public static String[] returnTheCopyLines(String[] fileLines, int currentLineNumber, int number) {
-        return new String[]{};
+        System.out.println(input); // Placeholder
     }
 
     public static void tryLocateCommand(String input) {
-        String[] inputs = getSubstituteStrings(input);
-        boolean hasTwoStrings = inputs.length == 2;
-        boolean hasTerminalSlash = input.charAt(input.length() - 1) == '/';
-        if (!hasTwoStrings || !hasTerminalSlash) System.out.println("Invalid input for locate.");
-        else runLocateCommand(inputs[1]);
-    }
-
-    private static void runLocateCommand(String input) {
-        int lineNumber = runLocateCommand(fileLines, currentLineNumber, input);
-        if (lineNumber < 0) {
-            System.out.println("The input String does not exist after this point.");
-        } else {
-            System.out.println("The input String occurs in line " + lineNumber);
-            currentLineNumber = lineNumber;
-            System.out.println(fileLines[currentLineNumber - 1]);
+        if (!locateCommandIsValid(input)) {
+            System.out.println("Invalid input for locate.");
+        }
+        else {
+            String fixedInput = getLocateString(input);
+            int locatedLine = runLocateCommand(fileLines, currentLineNumber, fixedInput);
+            if (locatedLine < 0) {
+                System.out.println("The String \"" + fixedInput + "\" does not exist after the current line.");
+            } else {
+                System.out.print("The String \"" + fixedInput + "\" exists in line number " + locatedLine + ": ");
+                currentLineNumber = locatedLine;
+                System.out.println(fileLines[currentLineNumber - 1]);
+            }
         }
     }
 
@@ -223,6 +192,48 @@ public class Main {
             if (fileLines[i].contains(input)) return i + 1;
         }
         return -1;
+    }
+
+    public static boolean locateCommandIsValid(String input) {
+        int numberOfFreeSlashes = 0;
+        int index = 0;
+        boolean lastThingSeenIsSlash = false;
+
+        while (index < input.length()) {
+            if (input.charAt(index) == '/') {
+                numberOfFreeSlashes++;
+                lastThingSeenIsSlash = true;
+            } else if (input.charAt(index) == '\\') {
+                index++;
+                lastThingSeenIsSlash = false;
+            }
+            index++;
+        }
+        return (numberOfFreeSlashes == 2) && lastThingSeenIsSlash;
+    }
+
+    public static String getLocateString(String input) {
+        StringBuilder locateString = new StringBuilder();
+
+        int index = 0;
+        int numberOfFreeSlashes = 0;
+        boolean justSeenABackSlash = false;
+
+        while (index < input.length()) {
+            boolean isSlash = isSlash(input.charAt(index));
+            boolean isBackSlash = isBackSlash(input.charAt(index));
+            if (justSeenABackSlash || (!isSlash && !isBackSlash)) {
+                if (numberOfFreeSlashes == 1) locateString.append(input.charAt(index));
+                justSeenABackSlash = false;
+            } else if (isSlash) {
+                numberOfFreeSlashes++;
+            } else {
+                justSeenABackSlash = true;
+            }
+            index++;
+        }
+
+        return locateString.toString();
     }
 
     public static void tryDeleteCommand(String input) {
