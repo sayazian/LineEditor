@@ -1,28 +1,76 @@
-Line editor
-Write a simple word processor that will accept text and commands as input.  The commands it should respond to are:
-Substitute/oldstring/newstring/	Type #
-Copy #	Paste 
-Locate/string/	Insert #
-Delete #	Replace #
-Move #	Quit
-The file will consist of up to 100 lines.  The program should be able to open an existing file or create a new one.  It should keep track of where the user is in the file at any time.  Each command is followed by a number which indicates the number of lines (The current line & those following) upon which the command should act.  Each command should operate on the specified line or lines of the file.  A detailed explanation of each command follows: 
-Substitute/oldstring/newstring/
-Substitute newstring for every occurrence of oldstring in the current line.  Issue a message if oldstring does not appear in the current line.  Print the changed line.
-Type #
-Print the contents of the next # lines, including the current one.  Don't print blank spaces at the end of a line.  The current line should be the last line typed.
-Copy #
-Copy the next # lines, including the current one, to a temporary storage area.  The current line should not change.
-Paste
-Copy the contents of the temporary storage area to a position between the current line and the line following the current line.  The current line should become the last line pasted.
-Locate/string/
-Find the next occurance of string and make the line containing it the current line.  If string does not occur anywhere in the file after the current line, issue a message and don't change the current line.  Then print the current line.
-Insert #
-Insert # lines into the file following the current line.  The current line should be the last line entered.
-Delete # 
-Delete the next # lines, including the current one.  Make the first line following the deleted section the current line.
-Replace #
-Replace the next # lines, beginning with the current one, with # lines.  The current line should be the last line entered.
-Move #
-Locate & print the line # lines past the current line.  Make that the current line.
-Quit 
-Saves the file to disk and quits the editor
+```md
+# Line Editor
+
+Write a simple word processor that accepts **text and commands** as input.
+
+## Overview
+- The file consists of up to **100 lines**.
+- The program can **open an existing file** or **create a new one**.
+- The editor keeps track of the **current line** at all times.
+- Each command is followed by a **number (`#`)** indicating how many lines (starting from the current line) the command applies to.
+- Each command operates on the specified line(s) in the file.
+
+---
+
+## Supported Commands
+
+### `Substitute/oldstring/newstring/`
+Substitute `newstring` for every occurrence of `oldstring` in the **current line**.  
+- If `oldstring` does not appear, issue a message.  
+- Print the modified line.
+
+---
+
+### `Type #`
+Print the contents of the next `#` lines, including the current line.  
+- Do not print trailing blank spaces.  
+- The **current line becomes the last line printed**.
+
+---
+
+### `Copy #`
+Copy the next `#` lines, including the current line, into a temporary storage area.  
+- The **current line does not change**.
+
+---
+
+### `Paste`
+Insert the contents of the temporary storage area **between the current line and the next line**.  
+- The **current line becomes the last line pasted**.
+
+---
+
+### `Locate/string/`
+Find the next occurrence of `string` after the current line.  
+- If found, make that line the current line and print it.  
+- If not found, issue a message and do not change the current line.
+
+---
+
+### `Insert #`
+Insert `#` new lines **after the current line**.  
+- The **current line becomes the last line entered**.
+
+---
+
+### `Delete #`
+Delete the next `#` lines, including the current line.  
+- The **first line after the deleted block becomes the current line**.
+
+---
+
+### `Replace #`
+Replace the next `#` lines (starting from the current line) with `#` new lines.  
+- The **current line becomes the last line entered**.
+
+---
+
+### `Move #`
+Move to the line `#` lines past the current line.  
+- Print that line and make it the current line.
+
+---
+
+### `Quit`
+Save the file to disk and exit the editor.
+```
